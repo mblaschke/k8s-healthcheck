@@ -46,10 +46,10 @@ var (
 
 
 func initMetrics() {
-	// Register the summary and the histogram with Prometheus's default registry.
 	prometheus.MustRegister(kubeNodeInfo)
 	prometheus.MustRegister(kubeNodeAge)
 	prometheus.MustRegister(kubeNodeStatusCondition)
+	prometheus.MustRegister(kubeNodeStatusUnschedulable)
 
 
 	go func() {
