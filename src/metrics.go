@@ -33,6 +33,15 @@ var (
 		},
 		[]string{"node", "condition", "status"},
 	)
+
+
+	kubeNodeStatusUnschedulable = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "kube_node_status_unschedulable",
+			Help: "Node status unschedulable",
+		},
+		[]string{"node"},
+	)
 )
 
 
@@ -65,6 +74,7 @@ func probeCollect() {
 	for _, node := range nodeList.Items {
 		kubeNodeInfo.With(prometheus.Labels{"node": node.Name}).Set(1)
 		kubeNodeAge.With(prometheus.Labels{"node": node.Name}).Set(time.Since(node.CreationTimestamp.Time).Minutes())
+		kubeNodeStatusUnschedulable.With(prometheus.Labels{"node": node.Name}).Set(boolFloat64(node.Spec.Unschedulable))
 
 		for _, condition := range node.Status.Conditions {
 			kubeNodeStatusCondition.With(prometheus.Labels{"node": node.Name, "condition": string(condition.Type), "status": "true"}).Set(boolFloat64(condition.Status == v1.ConditionTrue))
