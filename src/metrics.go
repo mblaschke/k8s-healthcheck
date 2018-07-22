@@ -18,10 +18,10 @@ var (
 		[]string{"node"},
 	)
 
-	kubeNodeAge = prometheus.NewGaugeVec(
+	kubeNodeCreated = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "kube_node_age_seconds",
-			Help: "Node age in minutes",
+			Name: "kube_node_created",
+			Help: "Node node creation timestamp",
 		},
 		[]string{"node"},
 	)
@@ -47,7 +47,7 @@ var (
 
 func initMetrics() {
 	prometheus.MustRegister(kubeNodeInfo)
-	prometheus.MustRegister(kubeNodeAge)
+	prometheus.MustRegister(kubeNodeCreated)
 	prometheus.MustRegister(kubeNodeStatusCondition)
 	prometheus.MustRegister(kubeNodeSpecUnschedulable)
 
@@ -71,9 +71,14 @@ func probeCollect() {
 		panic(err)
 	}
 
+	kubeNodeInfo.Reset()
+	kubeNodeCreated.Reset()
+	kubeNodeSpecUnschedulable.Reset()
+	kubeNodeStatusCondition.Reset()
+
 	for _, node := range nodeList.Items {
 		kubeNodeInfo.With(prometheus.Labels{"node": node.Name}).Set(1)
-		kubeNodeAge.With(prometheus.Labels{"node": node.Name}).Set(time.Since(node.CreationTimestamp.Time).Minutes())
+		kubeNodeCreated.With(prometheus.Labels{"node": node.Name}).Set(float64(node.CreationTimestamp.Time.Unix()))
 		kubeNodeSpecUnschedulable.With(prometheus.Labels{"node": node.Name}).Set(boolFloat64(node.Spec.Unschedulable))
 
 		for _, condition := range node.Status.Conditions {
