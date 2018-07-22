@@ -1,4 +1,4 @@
-package: k8s-monitor/src
+package: k8s-healthcheck/src
 import:
 - package: github.com/jessevdk/go-flags
 - package: github.com/prometheus/client_golang
@@ -6,12 +6,15 @@ import:
   - prometheus
   - prometheus/promhttp
 - package: k8s.io/api
+  version: kubernetes-1.11.1
   subpackages:
   - core/v1
 - package: k8s.io/apimachinery
+  version: kubernetes-1.11.1
   subpackages:
   - pkg/apis/meta/v1
 - package: k8s.io/client-go
+  version: kubernetes-1.11.1
   subpackages:
   - kubernetes
   - plugin/pkg/client/auth
